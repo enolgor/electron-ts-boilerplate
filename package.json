@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "electron-packager": "^6.0.0",
+    "electron-prebuilt": "^0.37.3",
+    "fs-jetpack": "^0.7.3",
+    "gulp": "^3.9.1",
+    "yargs": "^4.3.2"
+  }
+}
