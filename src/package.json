@@ -10,5 +10,6 @@
     "copyright": "Copyright (c) 2016 Some Guy",
     "company": "Some Company Inc.",
     "license_txt": "LICENSE.txt"
-  }
+  },
+  "private": true
 }

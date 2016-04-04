@@ -3,8 +3,10 @@
 const jetpack = require("fs-jetpack");
 const childProcess = require("child_process");
 const fs = require("fs");
+const gulp = require("gulp");
+const runSequence = require('run-sequence');
 
-const package_windows = function(resourcesDir, distDir, srcDir, manifest, cb){
+function makeInstallers(resourcesDir, distDir, srcDir, manifest, cb){
 
   const installer_options = {};
   installer_options['APP_NAME'] = manifest.name;
@@ -17,8 +19,6 @@ const package_windows = function(resourcesDir, distDir, srcDir, manifest, cb){
   installer_options['APP_FOLDER_NAME'] = manifest.name;
   installer_options['LICENSE_TXT'] = srcDir.path(manifest.buildProperties.license_txt);
   installer_options['INSTALLER_ICON'] = resourcesDir.path('icon.ico');
-
-  //console.log(installer_options['VERSION']); cb(); return;
 
   const paths = distDir.inspectTree('.').children.filter(child=>child.type==='dir').map(child=>distDir.cwd(child.name));
   console.log(JSON.stringify(paths));
@@ -45,4 +45,9 @@ function createInstaller(resourcesDir, installer_options, src, dest, resolve, re
   nsis.on('close', ()=>fs.unlink(dest.path(installer_name+'.nsi'), (e)=>{if(e) reject(e); else resolve();}));
 }
 
-module.exports = package_windows;
+let data;
+
+gulp.task('package-windows', cb=>makeInstallers(data.resourcesDir.cwd('./windows'), data.distDir.cwd('./windows'), data.srcDir, data.manifest, cb));
+gulp.task('release-windows', cb=>runSequence('dist-windows','package-windows', cb));
+
+module.exports = (_data)=>{ data = _data; }
