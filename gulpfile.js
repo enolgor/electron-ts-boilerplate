@@ -11,8 +11,9 @@ data.srcDir = jetpack.cwd('./src');
 data.buildDir = jetpack.dir('./build');
 data.resourcesDir = jetpack.cwd('./resources');
 data.distDir = jetpack.dir('./dist');
+data.appDir = data.srcDir.cwd('./app');
 data.manifest = data.srcDir.read('./package.json', 'json');
-data.manifest.buildProperties.version = data.manifest.version+'.'+(argv.build&&parseInt(argv.build)?argv.build:0)
+data.manifest.buildProperties.version = data.manifest.version+'.'+(argv.build&&parseInt(argv.build)?argv.build:0);
 data.arch = argv.arch?(parseInt(argv.arch)===32?'ia32':parseInt(argv.arch)===64?'x64':'all'):'all';
 data.platform = argv.platform?(argv.platform==='windows'?'windows':argv.platform==='linux'?'linux':'all'):'all';
 

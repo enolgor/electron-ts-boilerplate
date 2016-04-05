@@ -4,12 +4,16 @@
   "description": "SampleElectronApp is a sample electron application",
   "main": "main.js",
   "homepage": "https://foo.bar",
-  "author": "Some Guy",
+  "author": {
+    "name": "Some Guy",
+    "email": "some@guy.com"
+  },
   "license": "GNU GENERAL PUBLIC LICENSE",
   "buildProperties":{
     "copyright": "Copyright (c) 2016 Some Guy",
     "company": "Some Company Inc.",
-    "license_txt": "LICENSE.txt"
+    "license_txt": "LICENSE.txt",
+    "section": "misc"
   },
   "private": true
 }

@@ -21,7 +21,7 @@ function makeInstallers(resourcesDir, distDir, srcDir, manifest, cb){
   installer_options['INSTALLER_ICON'] = resourcesDir.path('icon.ico');
 
   const paths = distDir.inspectTree('.').children.filter(child=>child.type==='dir').map(child=>distDir.cwd(child.name));
-  console.log(JSON.stringify(paths));
+  //console.log(JSON.stringify(paths));
   let installer_single = (i, paths, cb) => {
     if(i == paths.length){ cb(); return;}
     createInstaller(resourcesDir, installer_options, paths[i], paths[i].cwd('..'), ()=>installer_single(++i,paths,cb), cb);
