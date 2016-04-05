@@ -47,7 +47,19 @@ gulp.task('dist-linux-clean', () => data.distDir.dir('./linux', {empty: true}));
 gulp.task('dist-linux', ['dist-linux-clean'], cb =>{
   data.electron_packager_options['out'] = data.distDir.path('./linux');
   data.electron_packager_options['platform'] = 'linux';
-  packager(data.electron_packager_options, (e,paths)=>{if(e) cb(e); else {copy_license(paths); cb();} });
+  let paths;
+  let installpath = data.manifest.buildProperties.path+"/"+data.manifest.name;
+  packager(data.electron_packager_options, (e,paths)=>{if(e) cb(e); else {
+    copy_license(paths);
+    paths = paths.map(path=>jetpack.cwd(path));
+    for(let i=0; i<paths.length; i++){
+      let path = paths[i];
+      let name = path.inspect('.').name;
+      path.rename('.',name+'-tmp');
+      let dest = path.dir('../'+name+installpath, {empty: true});
+      gulp.src(path.path('../'+name+'-tmp/**/*')).pipe(gulp.dest(dest.path('.'))).on('finish', ()=>{path.remove('../'+name+'-tmp'); if(i==(paths.length-1)) cb();});
+    }
+  }});
 });
 
 module.exports = (_data)=>{ data = _data; init(); }

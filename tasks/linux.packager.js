@@ -15,7 +15,7 @@ function debProperties(dist){
   prop.maintainer.name = data.manifest.author.name;
   prop.maintainer.email = data.manifest.author.email;
   prop.architecture = dist.inspect('.').name.indexOf('64')>-1?'amd64':'i386';
-  prop.installedSize = dist.inspectTree('.').size;
+  prop.installedSize = (dist.inspectTree('.').size/1024);
   prop.preDepends = ['dpkg (>= 1.15.6)'];
   prop.depends = null;
   prop.recommends = null;
@@ -30,6 +30,7 @@ function debProperties(dist){
 }
 
 gulp.task('package-linux', cb=>{
+  console.log("what");
   let distDir = data.distDir.cwd('./linux');
   const dists = distDir.inspectTree('.').children.filter(child=>child.type==='dir').map(child=>distDir.cwd(child.name));
   dists.forEach(dist=>gulp.src(dist.path('.')+'/**/*').pipe(deb(dist.inspect('.').name+'-setup.deb', debProperties(dist))).pipe(gulp.dest(distDir.path('.'))));

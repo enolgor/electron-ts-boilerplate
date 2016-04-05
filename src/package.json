@@ -13,7 +13,8 @@
     "copyright": "Copyright (c) 2016 Some Guy",
     "company": "Some Company Inc.",
     "license_txt": "LICENSE.txt",
-    "section": "misc"
+    "section": "misc",
+    "path": "/opt"
   },
   "private": true
 }
