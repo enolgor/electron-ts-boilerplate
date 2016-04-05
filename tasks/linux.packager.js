@@ -11,9 +11,9 @@ function debProperties(dist){
   const prop = {};
   prop.name = data.manifest.name;
   prop.version = data.manifest.buildProperties.version;
-  prop.mantainer = {};
-  prop.mantainer.name = data.manifest.author.name;
-  prop.mantainer.email = data.manifest.author.email;
+  prop.maintainer = {};
+  prop.maintainer.name = data.manifest.author.name;
+  prop.maintainer.email = data.manifest.author.email;
   prop.architecture = dist.inspect('.').name.indexOf('64')>-1?'amd64':'i386';
   prop.installedSize = dist.inspectTree('.').size;
   prop.preDepends = ['dpkg (>= 1.15.6)'];
