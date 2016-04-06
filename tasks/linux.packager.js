@@ -7,26 +7,21 @@ const runSequence = require('run-sequence');
 const deb = require("gulp-deb");
 const _ = require("lodash");
 
-let data;
+let data, prop;
 const patterns = {};
 let resourcesDir;
+
 function init(){
-  patterns.data = data;
+  patterns.manifest = data.manifest;
   resourcesDir = data.resourcesDir.cwd('./linux');
 }
 
-function getVar(dist, pattern){
-  return _.get(patterns, pattern);
-}
-
-function processVars(dist, content){
-  //for(let pattern in patterns) content = content.replace(new RegExp('{{'+pattern+'}}','g'), getVar(dist, pattern));
-  //return content;
-  return content;
-}
+const getVar = (dist, pattern)=>_.get(patterns, pattern);
+const processVars = (dist, content) => content.replace(/\{\{(.*?)\}\}/g, (regex,match)=>getVar(dist,match));
+const pipedProcessVars = (dist) => replace(/\{\{(.*?)\}\}/g,(regex,match)=>getVar(dist, match));
 
 function debProperties(dist){
-  const prop = {};
+  prop = {};
   prop.name = data.manifest.name;
   prop.version = data.manifest.buildProperties.version;
   prop.maintainer = {};
@@ -49,8 +44,7 @@ function debProperties(dist){
   if(resourcesDir.exists('./postinst.sh')) prop.scripts.postinst = processVars(dist, resourcesDir.read('./postinst.sh', 'utf-8'));
   if(resourcesDir.exists('./prerm.sh')) prop.scripts.prerm = processVars(dist, resourcesDir.read('./prerm.sh', 'utf-8'));
   if(resourcesDir.exists('./postrm.sh')) prop.scripts.postrm = processVars(dist, resourcesDir.read('./postrm.sh', 'utf-8'));
-  //console.log(prop.scripts.postinst);
-  //process.exit();
+  patterns.prop = prop;
   return prop;
 }
 
@@ -59,17 +53,13 @@ function createDeb(dist, resolve, reject){
   const name = dist.inspect('.').name;
   const temp = dist.cwd('../'+name+'-tmp');
   dist.copy('.', temp.path('.'+installpath));
-
-  gulp.src(resourcesDir.path('./include/root')+'/**/*').pipe(replace(/\{\{(.*)\}\}/g,(regex,match)=>getVar(dist, match))).pipe(rename(path=>{
+  resourcesDir.copy('./icon.png', temp.path('.'+installpath+'/icon.png'));
+  gulp.src(resourcesDir.path('./include')+'/**/*').pipe(pipedProcessVars(dist)).pipe(rename(path=>{
     path.basename = processVars(dist, path.basename);
     return path;
   })).pipe(gulp.dest(temp.path('.'))).on('finish', ()=>
-  gulp.src(resourcesDir.path('./include/appfolder')+'/**/*').pipe(replace(/\{\{(.*)\}\}/g,(regex,match)=>getVar(dist, match))).pipe(rename(path=>{
-    path.basename = processVars(dist, path.basename);
-    return path;
-  })).pipe(gulp.dest(temp.path('.'+installpath))).on('finish', ()=> resolve()
-    //gulp.src(temp.path('.')+'/**/*').pipe(deb(name+'-setup.deb', debProperties(dist))).pipe(gulp.dest(dist.path('..'))).on('finish', ()=>{/*temp.remove('.');*/ resolve();}).on('error', reject)
-  ));
+    gulp.src(temp.path('.')+'/**/*').pipe(deb(name+'-setup.deb', debProperties(dist))).pipe(gulp.dest(dist.path('..'))).on('finish', ()=>{temp.remove('.'); resolve();}).on('error', reject)
+  );
 }
 
 gulp.task('package-linux', cb=>{

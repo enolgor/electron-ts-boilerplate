@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name={{manifest.name}}
+Exec=/opt/{{manifest.name}}/{{manifest.name}}
+Icon={{manifest.name}}
+Type=Application
+Categories=Other;
