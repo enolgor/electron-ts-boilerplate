@@ -20,3 +20,4 @@ Electron Boilerplate with gulp tasks to build on windows and linux and make inst
 - Windows parse vars
 - Bower
 - Zip portable
+- More vars (category in desktop e.g.)
