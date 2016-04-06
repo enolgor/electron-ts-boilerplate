@@ -1,27 +1,15 @@
 'use strict'
 
 const gulp = require('gulp');
-const replace = require('gulp-replace');
-const rename = require('gulp-rename');
 const runSequence = require('run-sequence');
 const deb = require("gulp-deb");
-const _ = require("lodash");
+const tmp = require("tmp");
+const jetpack = require("fs-jetpack");
 
-let data, prop;
-const patterns = {};
-let resourcesDir;
-
-function init(){
-  patterns.manifest = data.manifest;
-  resourcesDir = data.resourcesDir.cwd('./linux');
-}
-
-const getVar = (dist, pattern)=>_.get(patterns, pattern);
-const processVars = (dist, content) => content.replace(/\{\{(.*?)\}\}/g, (regex,match)=>getVar(dist,match));
-const pipedProcessVars = (dist) => replace(/\{\{(.*?)\}\}/g,(regex,match)=>getVar(dist, match));
+let data;
 
 function debProperties(dist){
-  prop = {};
+  const prop = {};
   prop.name = data.manifest.name;
   prop.version = data.manifest.buildProperties.version;
   prop.maintainer = {};
@@ -34,32 +22,27 @@ function debProperties(dist){
   prop.recommends = null;
   prop.suggests = null;
   prop.enhances = null;
-  prop.section = data.manifest.buildProperties.section;
+  prop.section = data.manifest.buildProperties.linux.section;
   prop.priority = "optional";
   prop.homepage = data.manifest.homepage;
   prop.short_description = data.manifest.description;
   prop.long_description = data.manifest.description;
   prop.scripts = {};
-  if(resourcesDir.exists('./preinst.sh')) prop.scripts.preinst = processVars(dist, resourcesDir.read('./preinst.sh', 'utf-8'));
-  if(resourcesDir.exists('./postinst.sh')) prop.scripts.postinst = processVars(dist, resourcesDir.read('./postinst.sh', 'utf-8'));
-  if(resourcesDir.exists('./prerm.sh')) prop.scripts.prerm = processVars(dist, resourcesDir.read('./prerm.sh', 'utf-8'));
-  if(resourcesDir.exists('./postrm.sh')) prop.scripts.postrm = processVars(dist, resourcesDir.read('./postrm.sh', 'utf-8'));
-  patterns.prop = prop;
+  const installpath = data.manifest.buildProperties.linux.installpath+"/"+data.manifest.name;
+  prop.scripts.postinst = `#!/bin/sh\nchmod -R a+r ${installpath}\nchmod -R a+x ${installpath}\nchmod -R o-w ${installpath}\nln -s ${installpath}/icon.png /usr/share/pixmaps/${prop.name}.png`;
+  prop.scripts.prerm = `#!/bin/sh\nrm /usr/share/pixmaps/${prop.name}.png`;
   return prop;
 }
 
 function createDeb(dist, resolve, reject){
-  const installpath = data.manifest.buildProperties.path+"/"+data.manifest.name;
+  const prop = debProperties(dist);
+  const installpath = data.manifest.buildProperties.linux.installpath+"/"+data.manifest.name;
   const name = dist.inspect('.').name;
-  const temp = dist.cwd('../'+name+'-tmp');
+  const temp = jetpack.cwd(tmp.dirSync().name);
   dist.copy('.', temp.path('.'+installpath));
-  resourcesDir.copy('./icon.png', temp.path('.'+installpath+'/icon.png'));
-  gulp.src(resourcesDir.path('./include')+'/**/*').pipe(pipedProcessVars(dist)).pipe(rename(path=>{
-    path.basename = processVars(dist, path.basename);
-    return path;
-  })).pipe(gulp.dest(temp.path('.'))).on('finish', ()=>
-    gulp.src(temp.path('.')+'/**/*').pipe(deb(name+'-setup.deb', debProperties(dist))).pipe(gulp.dest(dist.path('..'))).on('finish', ()=>{temp.remove('.'); resolve();}).on('error', reject)
-  );
+  data.resourcesDir.copy('./icon.png', temp.path('.'+installpath+'/icon.png'));
+  temp.write(`./usr/share/applications/${prop.name}.desktop`, `[Desktop Entry]\nName=${prop.name}\nExec=${installpath}/${prop.name}\nIcon=${prop.name}\nType=Application\nCategories=${data.manifest.buildProperties.linux.categories}`);
+  gulp.src(temp.path('.')+'/**/*').pipe(deb(name+'-v'+data.manifest.buildProperties.version+'-setup.deb', prop)).pipe(gulp.dest(dist.path('..'))).on('finish', ()=>{temp.remove('.'); resolve();}).on('error', reject)
 }
 
 gulp.task('package-linux', cb=>{
@@ -73,5 +56,4 @@ gulp.task('package-linux', cb=>{
 });
 gulp.task('release-linux', cb=>runSequence('dist-linux', 'package-linux', cb));
 
-
-module.exports = (_data) => {data = _data; init();};
+module.exports = (_data) => {data = _data;};

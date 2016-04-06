@@ -10,11 +10,17 @@
   },
   "license": "GNU GENERAL PUBLIC LICENSE",
   "buildProperties":{
-    "copyright": "Copyright (c) 2016 Some Guy",
-    "company": "Some Company Inc.",
+    "short_name":"sample_electron_app",
     "license_txt": "LICENSE.txt",
-    "section": "misc",
-    "path": "/opt"
+    "windows":{
+      "company":"Copyright (c) 2016 Some Guy",
+      "copyright":"Some Company Inc."
+    },
+    "linux":{
+      "section": "misc",
+      "installpath": "/opt",
+      "categories":"Other;"
+    }
   },
   "private": true
 }

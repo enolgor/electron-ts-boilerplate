@@ -16,7 +16,6 @@ function init(){
   data.electron_packager_options['overwrite'] = true;
   data.electron_packager_options['arch'] = data.arch;
   data.electron_packager_options['prune'] = true;
-  data.electron_packager_options['app-copyright'] = data.manifest.buildProperties.copyright;
 }
 
 function copy_license(paths){
@@ -32,7 +31,8 @@ gulp.task('dist-windows-clean', () =>  data.distDir.dir('./windows', {empty: tru
 gulp.task('dist-windows', ['dist-windows-clean'], cb =>{
   data.electron_packager_options['out'] = data.distDir.path('./windows');
   data.electron_packager_options['platform'] = 'win32';
-  data.electron_packager_options['icon'] = data.resourcesDir.path('./windows/icon.ico');
+  data.electron_packager_options['icon'] = data.resourcesDir.path('./icon.ico');
+  data.electron_packager_options['app-copyright'] = data.manifest.buildProperties.windows.copyright;
   data.electron_packager_options['version-string'] = {
     CompanyName: data.manifest.buildProperties.company,
     OriginalFilename: data.manifest.name,

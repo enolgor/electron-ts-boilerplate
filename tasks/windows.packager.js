@@ -5,20 +5,21 @@ const childProcess = require("child_process");
 const fs = require("fs");
 const gulp = require("gulp");
 const runSequence = require('run-sequence');
+const tmp = require("tmp");
 
 function makeInstallers(resourcesDir, distDir, srcDir, manifest, cb){
 
   const installer_options = {};
   installer_options['APP_NAME'] = manifest.name;
-  installer_options['COMP_NAME'] = manifest.buildProperties.company;
+  installer_options['COMP_NAME'] = manifest.buildProperties.windows.company;
   installer_options['WEB_SITE'] = manifest.homepage;
-  installer_options['VERSION'] = manifest.version+'.'+manifest.buildProperties.version;
-  installer_options['COPYRIGHT'] = manifest.buildProperties.copyright;
+  installer_options['VERSION'] = manifest.buildProperties.version;
+  installer_options['COPYRIGHT'] = manifest.buildProperties.windows.copyright;
   installer_options['DESCRIPTION'] = manifest.description;
   installer_options['MAIN_APP_EXE'] = manifest.name+'.exe';
   installer_options['APP_FOLDER_NAME'] = manifest.name;
   installer_options['LICENSE_TXT'] = srcDir.path(manifest.buildProperties.license_txt);
-  installer_options['INSTALLER_ICON'] = resourcesDir.path('icon.ico');
+  installer_options['INSTALLER_ICON'] = resourcesDir.path('./icon.ico');
 
   const paths = distDir.inspectTree('.').children.filter(child=>child.type==='dir').map(child=>distDir.cwd(child.name));
   //console.log(JSON.stringify(paths));
@@ -37,17 +38,18 @@ function createInstaller(resourcesDir, installer_options, src, dest, resolve, re
   installer_options['INSTALL_FILES'] = src.path();
   installer_options['ARCH'] = installer_name.indexOf('64')>-1?'64':'32';
 
-  let installScript = resourcesDir.read('installer.nsis');
+  let installScript = resourcesDir.read('./installer.nsis');
   for(let pattern in installer_options) installScript = installScript.replace(new RegExp('{{'+pattern+'}}','g'), installer_options[pattern]);
-  dest.write(installer_name+'.nsi', installScript);
-  const nsis = childProcess.spawn('makensis', [dest.path(installer_name+'.nsi')], {stdio: 'inherit'});
+  let nsi = tmp.tmpNameSync();
+  jetpack.write(nsi, installScript);
+  const nsis = childProcess.spawn('makensis', [nsi], {stdio: 'inherit'});
   nsis.on('error', e=>reject('Failed building installer: '+installer_name+', reason: '+e));
-  nsis.on('close', ()=>fs.unlink(dest.path(installer_name+'.nsi'), (e)=>{if(e) reject(e); else resolve();}));
+  nsis.on('close', ()=>fs.unlink(dest.path(nsi), (e)=>{if(e) reject(e); else resolve();}));
 }
 
 let data;
 
-gulp.task('package-windows', cb=>makeInstallers(data.resourcesDir.cwd('./windows'), data.distDir.cwd('./windows'), data.srcDir, data.manifest, cb));
+gulp.task('package-windows', cb=>makeInstallers(data.resourcesDir, data.distDir.cwd('./windows'), data.srcDir, data.manifest, cb));
 gulp.task('release-windows', cb=>runSequence('dist-windows','package-windows', cb));
 
 module.exports = (_data)=>{ data = _data; }
