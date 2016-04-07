@@ -4,7 +4,7 @@ Electron Boilerplate with gulp tasks to run, serve with livereload, build and ma
 ## How to use this boilerplate
 
 - Install git, node & npm (comes with node) for windows or linux.
-- Install nsis software (only on windows) if you plan to buld windows binary installers. The nsis software folder should be on the windows PATH.
+- Install nsis software (only on windows) if you plan to build windows binary installers. The nsis software folder should be on the windows PATH.
 - Clone this repository: `git clone https://github.com/elterx/electron-boilerplate`
 - CD to directory and install dependencies `npm install`
 - If on linux install gulp globally (`npm install -g gulp`), on windows gulp.bat does the trick.
