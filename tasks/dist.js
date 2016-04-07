@@ -8,6 +8,7 @@ let data;
 
 function init(){
   data.electron_packager_options = {};
+  data.electron_packager_options['name'] = data.manifest.buildProperties.short_name;
   data.electron_packager_options['dir'] = data.buildDir.path();
   data.electron_packager_options['app-version'] = data.manifest.version;
   data.electron_packager_options['asar'] = true;
@@ -27,8 +28,8 @@ function copy_license(paths){
 };
 
 //WINDOWS
-gulp.task('dist-windows-clean', () =>  data.distDir.dir('./windows', {empty: true}));
-gulp.task('dist-windows', ['dist-windows-clean'], cb =>{
+gulp.task('dist-windows', cb =>{
+  data.distDir.dir('./windows', {empty: true})
   data.electron_packager_options['out'] = data.distDir.path('./windows');
   data.electron_packager_options['platform'] = 'win32';
   data.electron_packager_options['icon'] = data.resourcesDir.path('./icon.ico');
@@ -43,8 +44,8 @@ gulp.task('dist-windows', ['dist-windows-clean'], cb =>{
 });
 
 //LINUX
-gulp.task('dist-linux-clean', () => data.distDir.dir('./linux', {empty: true}));
-gulp.task('dist-linux', ['dist-linux-clean'], cb =>{
+gulp.task('dist-linux', cb =>{
+  data.distDir.dir('./linux', {empty: true})
   data.electron_packager_options['out'] = data.distDir.path('./linux');
   data.electron_packager_options['platform'] = 'linux';
   packager(data.electron_packager_options, (e,paths)=>{if(e) cb(e); else { copy_license(paths); cb(); }});

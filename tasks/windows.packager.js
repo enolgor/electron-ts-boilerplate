@@ -4,7 +4,6 @@ const jetpack = require("fs-jetpack");
 const childProcess = require("child_process");
 const fs = require("fs");
 const gulp = require("gulp");
-const runSequence = require('run-sequence');
 const tmp = require("tmp");
 
 function makeInstallers(resourcesDir, distDir, srcDir, manifest, cb){
@@ -16,7 +15,7 @@ function makeInstallers(resourcesDir, distDir, srcDir, manifest, cb){
   installer_options['VERSION'] = manifest.buildProperties.version;
   installer_options['COPYRIGHT'] = manifest.buildProperties.windows.copyright;
   installer_options['DESCRIPTION'] = manifest.description;
-  installer_options['MAIN_APP_EXE'] = manifest.name+'.exe';
+  installer_options['MAIN_APP_EXE'] = manifest.buildProperties.short_name+'.exe';
   installer_options['APP_FOLDER_NAME'] = manifest.name;
   installer_options['LICENSE_TXT'] = srcDir.path(manifest.buildProperties.license_txt);
   installer_options['INSTALLER_ICON'] = resourcesDir.path('./icon.ico');
@@ -50,6 +49,6 @@ function createInstaller(resourcesDir, installer_options, src, dest, resolve, re
 let data;
 
 gulp.task('package-windows', cb=>makeInstallers(data.resourcesDir, data.distDir.cwd('./windows'), data.srcDir, data.manifest, cb));
-gulp.task('release-windows', cb=>runSequence('dist-windows','package-windows', cb));
+//gulp.task('release-windows', cb=>runSequence('dist-windows','package-windows', cb));
 
 module.exports = (_data)=>{ data = _data; }

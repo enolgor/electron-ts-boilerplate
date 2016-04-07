@@ -25,20 +25,21 @@ require('./tasks/windows.packager.js')(data);
 
 require('./tasks/linux.packager.js')(data);
 
-gulp.task('dist', cb=>{
-  if(data.platform==='windows') runSequence('build', 'dist-windows');
-  else if(data.platform==='linux') runSequence('build', 'dist-linux');
-  else runSequence('build', 'dist-windows', 'dist-linux');
+gulp.task('dist', ['build'], cb=>{
+  if(data.platform==='windows') runSequence('dist-windows', cb);
+  else if(data.platform==='linux') runSequence('dist-linux', cb);
+  else runSequence('dist-windows', 'dist-linux', cb);
 });
 
 gulp.task('package', cb=>{
-  if(data.platform==='windows') runSequence('package-windows');
-  else if(data.platform==='linux') runSequence('package-linux');
-  else runSequence('package-windows', 'package-linux');
+  if(data.platform==='windows') runSequence('package-windows', cb);
+  else if(data.platform==='linux') runSequence('package-linux', cb);
+  else runSequence('package-windows', 'package-linux', cb);
 });
 
-gulp.task('release', cb=>{
-  if(data.platform==='windows') runSequence('release-windows');
+gulp.task('release', cb=>{ runSequence('dist', 'package', cb);
+
+  /*if(data.platform==='windows') runSequence('release-windows');
   else if(data.platform==='linux') runSequence('release-linux');
-  else runSequence('release-windows', 'release-linux');
+  else runSequence('release-windows', 'release-linux');*/
 });

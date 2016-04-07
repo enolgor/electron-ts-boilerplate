@@ -1,7 +1,6 @@
 'use strict'
 
 const gulp = require('gulp');
-const runSequence = require('run-sequence');
 const deb = require("gulp-deb");
 const tmp = require("tmp");
 const jetpack = require("fs-jetpack");
@@ -28,20 +27,20 @@ function debProperties(dist){
   prop.short_description = data.manifest.description;
   prop.long_description = data.manifest.description;
   prop.scripts = {};
-  const installpath = data.manifest.buildProperties.linux.installpath+"/"+data.manifest.name;
-  prop.scripts.postinst = `#!/bin/sh\nchmod -R a+r ${installpath}\nchmod -R a+x ${installpath}\nchmod -R o-w ${installpath}\nln -s ${installpath}/icon.png /usr/share/pixmaps/${prop.name}.png`;
-  prop.scripts.prerm = `#!/bin/sh\nrm /usr/share/pixmaps/${prop.name}.png`;
+  const installpath = data.manifest.buildProperties.linux.installpath+"/"+data.manifest.buildProperties.short_name;
+  prop.scripts.postinst = `#!/bin/sh\nchmod -R a+r ${installpath}\nchmod -R a+x ${installpath}\nchmod -R o-w ${installpath}\nln -s ${installpath}/icon.png /usr/share/pixmaps/${data.manifest.buildProperties.short_name}.png`;
+  prop.scripts.prerm = `#!/bin/sh\nrm /usr/share/pixmaps/${data.manifest.buildProperties.short_name}.png`;
   return prop;
 }
 
 function createDeb(dist, resolve, reject){
   const prop = debProperties(dist);
-  const installpath = data.manifest.buildProperties.linux.installpath+"/"+data.manifest.name;
+  const installpath = data.manifest.buildProperties.linux.installpath+"/"+data.manifest.buildProperties.short_name;
   const name = dist.inspect('.').name;
   const temp = jetpack.cwd(tmp.dirSync().name);
   dist.copy('.', temp.path('.'+installpath));
   data.resourcesDir.copy('./icon.png', temp.path('.'+installpath+'/icon.png'));
-  temp.write(`./usr/share/applications/${prop.name}.desktop`, `[Desktop Entry]\nName=${prop.name}\nExec=${installpath}/${prop.name}\nIcon=${prop.name}\nType=Application\nCategories=${data.manifest.buildProperties.linux.categories}`);
+  temp.write(`./usr/share/applications/${data.manifest.buildProperties.short_name}.desktop`, `[Desktop Entry]\nName=${prop.name}\nExec=${installpath}/${data.manifest.buildProperties.short_name}\nIcon=${data.manifest.buildProperties.short_name}\nType=Application\nCategories=${data.manifest.buildProperties.linux.categories}`);
   gulp.src(temp.path('.')+'/**/*').pipe(deb(name+'-v'+data.manifest.buildProperties.version+'-setup.deb', prop)).pipe(gulp.dest(dist.path('..'))).on('finish', ()=>{temp.remove('.'); resolve();}).on('error', reject)
 }
 
@@ -54,6 +53,6 @@ gulp.task('package-linux', cb=>{
   };
   deb_single(0, dists, ()=>cb(), ()=>cb('Error creating deb package'));
 });
-gulp.task('release-linux', cb=>runSequence('dist-linux', 'package-linux', cb));
+//gulp.task('release-linux', cb=>runSequence('dist-linux', 'package-linux', cb));
 
 module.exports = (_data) => {data = _data;};
