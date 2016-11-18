@@ -4,7 +4,7 @@ const gulp = require('gulp');
 const uglify = require('gulp-uglify');
 const usemin = require('gulp-usemin');
 const childProcess = require("child_process");
-const electron = require("electron-prebuilt");
+const electron = require("electron");
 const livereload = require("gulp-livereload");
 const runSequence = require("run-sequence");
 
