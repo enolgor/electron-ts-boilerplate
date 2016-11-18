@@ -28,5 +28,5 @@ place in the **resources** folder in two different formats: *icon.ico* for the w
 There are four files under the tasks folder:
 - **build.js** contains the run, build and serve taks. Here is where you can manipulate the build process (using usemin, uglify, etc...).
 - **dist.js** contains the tasks related to the creation of binary distributions of the electron application, using the *electron-packager* module.
-- **windows.packager.js** is the one that controls the windows installer creation task, using the *makensis* tool of nsis and **resources/installer.nsis** as template for the installer creation.
+- **windows.packager.js** is the one that controls the windows installer creation task, using the [*makensis* tool of nsis](https://sourceforge.net/projects/nsis/files/latest/download?source=typ_redirect) and **resources/installer.nsis** as template for the installer creation.
 - The last file, **linux.packager.js** uses the *gulp-deb* module to create the linux deb packages.
