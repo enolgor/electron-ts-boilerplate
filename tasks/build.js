@@ -4,14 +4,22 @@ const gulp = require('gulp');
 const uglify = require('gulp-uglify');
 const usemin = require('gulp-usemin');
 const childProcess = require("child_process");
-const electron = require("electron");
-const livereload = require("gulp-livereload");
+//const electron = require("electron");
 const runSequence = require("run-sequence");
+
 
 let data;
 
-gulp.task('run', ()=>{const proc = childProcess.spawn(electron, [data.srcDir.path()], {stdio: 'inherit'}); proc.on('close', process.exit); });
-gulp.task('watch', ()=>{livereload.listen(); gulp.watch(data.appDir.path()+'/**/*', (change)=>{ gulp.src(change.path).pipe(livereload()); }); });
+//gulp.task('run', ()=>{const proc = childProcess.spawn(electron, [data.srcDir.path()], {stdio: 'inherit'}); proc.on('close', process.exit); });
+gulp.task('run', ()=>{
+  const electron = require('electron-connect').server.create({path: data.srcDir.path()});
+
+  //const proc = childProcess.spawn(electron, [data.srcDir.path()], {stdio: 'inherit'}); proc.on('close', process.exit);
+  electron.start();
+  gulp.watch(data.srcDir.path()+'/main.js', electron.restart);
+  gulp.watch(data.appDir.path()+'/**/*', electron.reload);
+});
+//gulp.task('watch', ()=>{livereload.listen(); gulp.watch(data.appDir.path()+'/**/*', (change)=>{ gulp.src(change.path).pipe(livereload()); }); });
 gulp.task('serve', ()=>runSequence('watch', 'run'));
 
 gulp.task('clean', ()=>data.buildDir.dir('.', {empty: true}));

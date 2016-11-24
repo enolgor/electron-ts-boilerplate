@@ -1,6 +1,7 @@
 'use strict';
 
 const electron = require('electron');
+const client = require('electron-connect').client;
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
@@ -27,6 +28,7 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+  client.create(mainWindow);
 }
 
 // This method will be called when Electron has finished
