@@ -1,36 +1,52 @@
-'use strict'
-
 const gulp = require('gulp');
+const browserify = require('browserify');
+const source = require('vinyl-source-stream');
+const watchify = require('watchify');
+const gutil = require('gulp-util');
+const tsify = require('tsify');
 const uglify = require('gulp-uglify');
-const usemin = require('gulp-usemin');
-const childProcess = require("child_process");
-//const electron = require("electron");
-const runSequence = require("run-sequence");
+const sourcemaps = require('gulp-sourcemaps');
+const buffer = require('vinyl-buffer');
+const _electron = require('electron-connect').server;
 
 
-let data;
+module.exports = (data)=>{
+    const src = data.appDir_src;
+    const dist = data.appDir_dist;
+    const clean = () => dist.dir('.', {empty: true});
+    const copy = () => gulp.src(['**/*.*','!**/*.ts'], {cwd: src.path('.')}).pipe(gulp.dest(dist.path('.')));
 
-//gulp.task('run', ()=>{const proc = childProcess.spawn(electron, [data.srcDir.path()], {stdio: 'inherit'}); proc.on('close', process.exit); });
-gulp.task('run', ()=>{
-  const electron = require('electron-connect').server.create({path: data.srcDir.path()});
+    const watchedBrowserify = watchify(browserify({
+        basedir: src.path('.'),
+        debug: true,
+        entries: ['./main.ts'],
+        cache: {},
+        packageCache: {}
+    }).plugin(tsify));
 
-  //const proc = childProcess.spawn(electron, [data.srcDir.path()], {stdio: 'inherit'}); proc.on('close', process.exit);
-  electron.start();
-  gulp.watch(data.srcDir.path()+'/main.js', electron.restart);
-  gulp.watch(data.appDir.path()+'/**/*', electron.reload);
-});
-//gulp.task('watch', ()=>{livereload.listen(); gulp.watch(data.appDir.path()+'/**/*', (change)=>{ gulp.src(change.path).pipe(livereload()); }); });
-gulp.task('serve', ()=>runSequence('watch', 'run'));
+    const bundle = () => watchedBrowserify
+    .transform('babelify', {
+        presets: ['es2015'],
+        extensions: ['.ts']
+    })
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(uglify())
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest(dist.path('.')));
 
-gulp.task('clean', ()=>data.buildDir.dir('.', {empty: true}));
-gulp.task('copy', ['clean'], ()=>data.projectDir.copy(data.srcDir.path(), data.buildDir.path(), {
-  overwrite: true,
-  matching: ['./node_modules/**/*', data.appDir.inspect('.').name+'/**/*', data.manifest.main, 'package.json']
-}));
-//gulp.task('build', ['copy'], ()=>gulp.src('./app/index.html').pipe(usemin({js: [uglify()]})).pipe(gulp.dest('build/')));
-gulp.task('build', ['copy'], ()=>{
-  let buildApp = data.buildDir.path(data.appDir.inspect('.').name);
-  gulp.src(buildApp+'/*.html').pipe(usemin({js: [uglify()]})).pipe(gulp.dest(buildApp+'/'))
-});
+    gulp.task('serve', ()=>{
+        const electron = _electron.create({path: data.srcDir.path('.')});
+        electron.start();
+        copy();
+        bundle();
+        gulp.watch(data.srcDir.path('main.js'), electron.restart);
+        gulp.watch([src.path('/**/*.*'), '!'+src.path('/**/*.ts')], ()=>{clean(); copy(); bundle(); electron.reload();});
+        watchedBrowserify.on('update', ()=>{bundle(); electron.reload();});
+        watchedBrowserify.on('log', gutil.log);
+    });
+}
 
-module.exports = (_data)=>{ data = _data; }
+
