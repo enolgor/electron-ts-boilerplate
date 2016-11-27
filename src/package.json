@@ -9,18 +9,21 @@
     "email": "some@guy.com"
   },
   "license": "GNU GENERAL PUBLIC LICENSE",
-  "buildProperties":{
-    "short_name":"sample_electron_app",
+  "buildProperties": {
+    "short_name": "sample_electron_app",
     "license_txt": "LICENSE.txt",
-    "windows":{
-      "company":"Copyright (c) 2016 Some Guy",
-      "copyright":"Some Company Inc."
+    "windows": {
+      "company": "Copyright (c) 2016 Some Guy",
+      "copyright": "Some Company Inc."
     },
-    "linux":{
+    "linux": {
       "section": "misc",
       "installpath": "/opt",
-      "categories":"Other;"
+      "categories": "Other;"
     }
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "lodash": "^4.17.2"
+  }
 }

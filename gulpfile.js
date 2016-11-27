@@ -12,8 +12,7 @@ data.buildDir = jetpack.dir('./build');
 data.resourcesDir = jetpack.cwd('./resources');
 data.distDir = jetpack.dir('./dist');
 data.appDir = data.srcDir.cwd('./app');
-data.appDir_src = data.appDir.cwd('./src');
-data.appDir_dist = data.appDir.cwd('./dist');
+data.appDir_src = data.srcDir.cwd('./app-src');
 data.manifest = data.srcDir.read('./package.json', 'json');
 data.manifest.buildProperties.version = data.manifest.version+'.'+(argv.build&&parseInt(argv.build)?argv.build:0);
 data.arch = argv.arch?(parseInt(argv.arch)===32?'ia32':parseInt(argv.arch)===64?'x64':'all'):'all';
@@ -41,7 +40,4 @@ gulp.task('package', cb=>{
 
 gulp.task('release', cb=>{ runSequence('dist', 'package', cb);
 
-  /*if(data.platform==='windows') runSequence('release-windows');
-  else if(data.platform==='linux') runSequence('release-linux');
-  else runSequence('release-windows', 'release-linux');*/
 });

@@ -1,7 +1,9 @@
 'use strict';
 
 const electron = require('electron');
-const client = require('electron-connect').client;
+
+const dev = process.argv.indexOf('dev')!==-1;
+
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
@@ -16,10 +18,11 @@ function createWindow () {
   mainWindow = new BrowserWindow({width: 800, height: 600});
 
   // and load the index.html of the app.
-  mainWindow.loadURL('file://' + __dirname + '/app/dist' + '/index.html');
+  mainWindow.loadURL('file://' + __dirname + '/app' + '/index.html');
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools({detach: true});
+
+  if(dev) mainWindow.webContents.openDevTools({detach: true});
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
@@ -28,7 +31,7 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
-  client.create(mainWindow);
+  if(dev) require('electron-connect').client.create(mainWindow);
 }
 
 // This method will be called when Electron has finished

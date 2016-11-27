@@ -45,17 +45,13 @@ const tsify = require('tsify');
 const uglify = require('gulp-uglify');
 const sourcemaps = require('gulp-sourcemaps');
 const buffer = require('vinyl-buffer');
+const runSequence = require("run-sequence");
 
 let data;
 
 const _electron = require('electron-connect').server;
 
-const copy = () =>{
-  gulp.src(data.appDir_src.path('./*.html')).pipe(gulp.dest(data.appDir_dist.path('.')));
-};
-
-gulp.task('serve', ()=>{
-  const watchedBrowserify = watchify(browserify({
+const watchedBrowserify = watchify(browserify({
       basedir: data.appDir_src.path('.'),
       debug: true,
       entries: ['./main.ts'],
@@ -63,25 +59,29 @@ gulp.task('serve', ()=>{
       packageCache: {}
   }).plugin(tsify));
 
-  const bundle = () => watchedBrowserify
-    .transform('babelify', {
-        presets: ['es2015'],
-        extensions: ['.ts']
-    })
-    .bundle()
-    .pipe(source('bundle.js'))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(uglify())
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest(data.appDir_dist.path('.')));
+gulp.task('copy', ()=>gulp.src(data.appDir_src.path('./*.html')).pipe(gulp.dest(data.appDir_dist.path('.'))));
 
-  copy();
-  bundle();
+gulp.task('bundle', ()=>watchedBrowserify
+  .transform('babelify', {
+    presets: ['es2015'],
+    extensions: ['.ts']
+  })
+  .bundle()
+  .pipe(source('bundle.js'))
+  .pipe(buffer())
+  .pipe(sourcemaps.init({loadMaps: true}))
+  .pipe(uglify())
+  .pipe(sourcemaps.write('./'))
+  .pipe(gulp.dest(data.appDir_dist.path('.'))));
+watchedBrowserify.on('update', ()=>{console.log('hi');});
+gulp.task('electron-update', ['copy', 'bundle'], ()=>{
+  console.log('please reload');
+});
 
+gulp.task('serve', ['copy', 'bundle'], ()=>{
   const electron = _electron.create({path: data.srcDir.path('.')});
   electron.start();
-  watchedBrowserify.on('update', ()=>{console.log('hola'); copy(); bundle(); electron.reload();});
+  //
   watchedBrowserify.on('log', gutil.log);
 });
 
