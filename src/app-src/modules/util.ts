@@ -1,3 +1,5 @@
-const version = (item: string) => window.process.versions[item];
+import { process } from './window';
+
+const version = (item: string) => process.versions[item];
 //this is a test
 export { version };

@@ -7,7 +7,8 @@ Electron Boilerplate with gulp tasks to run, serve with livereload, build and ma
 - Install [nsis](https://sourceforge.net/projects/nsis/files/latest/download?source=typ_redirect) software (only on windows) if you plan to build windows binary installers. The nsis software folder should be on the windows PATH.
 - Clone this repository: `git clone https://github.com/elterx/electron-boilerplate`
 - CD to directory and install dependencies `npm install`
-- If on linux install gulp globally (`npm install -g gulp`), on windows gulp.bat does the trick.
+- If on linux install gulp and bower globally (`npm install -g gulp bower`), on windows gulp.bat and bower.bat does the trick.
+- Install bower dependencies: `bower install`
 - Your electron app will be in the **src** folder, where your application **package.json**, **LICENSE** file, **main script** of application and under the **app-src** folder the rest of html/javascript/css files.
 - The typescript transpiler options can be found in **src/app/tsconfig.json**
 - Also, any node dependency of your application should be installed in the **src** folder and saved in the **src/package.json** file. This folder is the place to install bower.

@@ -4,14 +4,21 @@
     <meta charset="UTF-8">
     <title>Hello World!</title>
     <style>
-    body{background-color: white;}
+        body{background-color: white;}
     </style>
+
+    <!-- build:js lib.js -->
+    <script src="../lib/vue/dist/vue.js"></script>
+    <!-- endbuild -->
+
   </head>
   <body>
-    <h1>Hello World! :)</h1>
-    We are using node <span id="version-node"></span>,
-    Chromium <span id="version-chromium"></span>,
-    and Electron as <span id="version-electron"></span>.
+    <h1>Hello World!</h1>
+    <div id="info">
+      We are using node {{ node_version }},
+      Chromium {{ chrome_version }},
+      and Electron as {{ electron_version }}.
+    </div>
   </body>
   <script src="bundle.js"></script>
 </html>

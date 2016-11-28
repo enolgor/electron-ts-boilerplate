@@ -1,5 +1,11 @@
 import { version } from './modules/util';
+import { Vue } from './modules/window';
 
-document.getElementById('version-node').innerHTML = version('node');
-document.getElementById('version-chromium').innerHTML = version('chrome');
-document.getElementById('version-electron').innerHTML = version('electron');
+var app = new Vue({
+  el: '#info',
+  data: {
+    node_version: version('node'),
+    chrome_version: version('chrome'),
+    electron_version: version('electron')
+  }
+});
