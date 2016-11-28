@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- build:remove -->
-    <script src="bundle.js"></script>
-    <!-- endbuild -->
     <meta charset="UTF-8">
     <title>Hello World!</title>
     <style>
@@ -12,8 +9,9 @@
   </head>
   <body>
     <h1>Hello World! :)</h1>
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron as <script>document.write(process.versions.electron)</script>.
+    We are using node <span id="version-node"></span>,
+    Chromium <span id="version-chromium"></span>,
+    and Electron as <span id="version-electron"></span>.
   </body>
+  <script src="bundle.js"></script>
 </html>

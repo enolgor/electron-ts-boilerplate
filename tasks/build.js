@@ -17,7 +17,7 @@ const electron = require('electron');
 
 
 module.exports = (data)=>{
-    const static_files = ['**/*','!**/*.ts'];
+    const static_files = ['**/*','!**/*.ts','!tsconfig.json'];
     const src = data.appDir_src;
     const app = data.appDir;
 
@@ -27,7 +27,7 @@ module.exports = (data)=>{
         entries: ['./main.ts'],
         cache: {},
         packageCache: {}
-    }).plugin(tsify).transform('babelify', {
+    }).plugin(tsify, {project: src.path('tsconfig.json')}).transform('babelify', {
         presets: ['es2015'],
         extensions: ['.ts']
     }));

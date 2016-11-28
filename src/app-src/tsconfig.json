@@ -1,7 +1,7 @@
-{
-   "includes": [
-       "src/**/*.ts"
-   ],
+{   
+    "includes": [
+       "app-src/**/*.ts"
+    ],
     "compilerOptions": {
         "noImplicitAny": true,
         "target": "es2015"
