@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/enolgor/electron-ts-boilerplate.svg?branch=master)](https://travis-ci.org/enolgor/electron-ts-boilerplate)
+
 # Electron-Typescript-Boilerplate
 Electron Boilerplate with gulp tasks to run, serve with livereload, build and make windows/linux distributions, binary installers for windows (with makensis) and deb installers.
 
